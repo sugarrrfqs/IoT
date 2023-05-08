@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h> 
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -8,7 +10,6 @@
 #include <pthread.h>
 
 void* func (void* arg);
-
 
 int main()
 {	
@@ -47,7 +48,6 @@ int main()
 	while (socketC!= -1)
 	{
 		socketC = accept(socketL, NULL, NULL);
-		if (socketC == -1) printf("before pthread"); 
 		pthread_create(&id, NULL, func, &socketC);
 	}
 	close (socketL);
@@ -58,9 +58,57 @@ int main()
 void* func (void* arg)
 {
 	int socket = *(int*)arg;
-	int number = 1;
+	int clientType = 0;
+	char str[256] = "s";
+	char eom[256] = "---";
+	char* filename = "/home/sgrrr/IoT/serverWifiInfo.txt";
+		
+	read (socket, &clientType, sizeof(clientType));
 	
-//обработка соединения
+	if (clientType == 1) // сканер wifi
+	{
+		system("echo wifi scan connected");
+				
+		while(read (socket, &str, 256) > 0)
+		{	
+			FILE *fp = fopen(filename, "w");
+			if(fp)
+			{
+				while (strcmp(str, eom) != 0)
+				{				
+					fputs(str, fp);	
+					read (socket, &str, 256);					
+				}
+				fclose(fp);
+				system("echo ----- wifi info received");
+				sleep(5);			
+			}		
+		}
+		system("echo wifi scan disconnected");
+	}
+	if (clientType == 2) // мобильный клиент
+	{
+		system("echo mobile client connected");
+		
+		while(read (socket, &str, 256) > 0)
+		{				
+			FILE *fp = fopen(filename, "r");
+			if(fp)
+			{
+				while(fgets(str, 256, fp) != NULL)
+				{				
+					write(socket, str, sizeof(str));
+				}
+				write(socket, eom, sizeof(eom));
+				fclose(fp);
+			} 								
+			system("echo ----- wifi info sended");
+			sleep(5);			
+					
+		}
+		system("echo mobile client disconnected");
+	}
+
 	close (socket);
 	return NULL;
 }
