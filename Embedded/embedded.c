@@ -10,7 +10,10 @@ int main()
 {
 	int sd;
 	struct sockaddr_in tss_addr;
-	string str;		
+	char str[256];	
+	char eom[256] = "---";
+	int clientType = 1;
+	char* filename = "/home/sgrrr/IoT/wifiInfo.txt";	
 		
 	sd = socket (AF_INET, SOCK_STREAM, 0);
 		
@@ -21,21 +24,35 @@ int main()
 		
 	if (connect(sd, (struct sockaddr *)&tss_addr, sizeof(tss_addr)) == -1)
 	{ 
-		printf("Ошибка подключения"); 
+		printf("Connection error\n"); 
 		return -1; 
 	}
 	else
 	{
-		printf("Подключен"); 
+		write(sd, &clientType, sizeof(clientType));
+		printf("Connected\n"); 
 	}
 		
-	//while (true)
-	//{
+	while (sd != -1)
+	{
 		//system("nmcli dev wifi list > wifiInfo.txt");
-		system("echo wifi info recieved");
-		system("cat ~/IoT/wifiInfo.txt | awk -v sum=0 -v c=$1 '{sum++} END {print sum}'");
-
-	//}
+		//system("cat /home/sgrrr/IoT/wifiInfo.txt | awk -v sum=0 -v c=$1 '{sum++} END {print sum}'");
+		printf("wifi info collected\n");
+			
+		// чтение из файла и передача серверу
+		FILE *fp = fopen(filename, "r");
+		if(fp)
+		{
+			fgets(str, 256, fp);
+			while(fgets(str, 256, fp) != NULL)
+			{				
+				write(sd, str, sizeof(str));
+			}
+			write(sd, eom, sizeof(eom));
+			fclose(fp);
+		} 
+		sleep(5);
+	}
 	
 	close (sd);
 	return 0;
