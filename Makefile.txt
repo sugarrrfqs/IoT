@@ -1,0 +1,11 @@
+all: emb serv client
+
+emb: embedded.c
+	clang -o emb embedded.c
+	
+serv: serv.c
+	gcc -pthread -o serv serv.c
+	
+client: client.c	
+	clang -o client client.c
+
