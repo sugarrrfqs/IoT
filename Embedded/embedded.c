@@ -12,7 +12,7 @@ int main()
 	struct sockaddr_in tss_addr;
 	char str[256];	
 	char eom[256] = "---";
-	int clientType = 1;
+	char clientType[256] = "1";
 	char* filename = "/home/sgrrr/IoT/wifiInfo.txt";
 	int command = 0;	
 		
