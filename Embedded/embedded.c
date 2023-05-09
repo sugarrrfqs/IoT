@@ -13,7 +13,8 @@ int main()
 	char str[256];	
 	char eom[256] = "---";
 	int clientType = 1;
-	char* filename = "/home/sgrrr/IoT/wifiInfo.txt";	
+	char* filename = "/home/sgrrr/IoT/wifiInfo.txt";
+	int command = 0;	
 		
 	sd = socket (AF_INET, SOCK_STREAM, 0);
 		
@@ -33,25 +34,27 @@ int main()
 		printf("Connected\n"); 
 	}
 		
-	while (sd != -1)
+	while (read(sd, &command, sizeof(command) > 0))
 	{
-		//system("nmcli dev wifi list > wifiInfo.txt");
-		//system("cat /home/sgrrr/IoT/wifiInfo.txt | awk -v sum=0 -v c=$1 '{sum++} END {print sum}'");
-		printf("wifi info collected\n");
-			
-		// чтение из файла и передача серверу
-		FILE *fp = fopen(filename, "r");
-		if(fp)
+		if (command == 1)
 		{
-			fgets(str, 256, fp);
-			while(fgets(str, 256, fp) != NULL)
-			{				
-				write(sd, str, sizeof(str));
-			}
-			write(sd, eom, sizeof(eom));
-			fclose(fp);
-		} 
-		sleep(5);
+			//system("nmcli dev wifi list > /home/sgrrr/IoT/wifiInfo.txt");
+			printf("wifi info collected\n");
+				
+			// чтение из файла и передача серверу
+			FILE *fp = fopen(filename, "r");
+			if(fp)
+			{
+				fgets(str, 256, fp);
+				while(fgets(str, 256, fp) != NULL)
+				{				
+					write(sd, str, sizeof(str));
+					//printf("%s\n", str);	
+				}
+				write(sd, eom, sizeof(eom));
+				fclose(fp);
+			} 
+		}
 	}
 	
 	close (sd);
