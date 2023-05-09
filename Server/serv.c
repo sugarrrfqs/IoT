@@ -13,6 +13,7 @@
 void* func (void* arg);
 
 int command = -1;
+char scommand[256];
 char* filename = "/home/sgrrr/IoT/serverWifiInfo.txt";
 char eom[256] = "---";
 sem_t semaphore;
@@ -69,20 +70,24 @@ int main()
 void* func (void* arg)
 {
 	int socket = *(int*)arg;
-	int clientType = 0;
+	char clientType[256];
 	char str[256] = "s";
-		
-	read (socket, &clientType, sizeof(clientType));
 	
-	if (clientType == 1) // сканер wifi
+	
+	//system("echo something connected");	
+	read (socket, clientType, sizeof(clientType));
+	//printf("%s\n", clientType);
+	
+	if (strcmp(clientType, "1") == 0) // сканер wifi
 	{
 		system("echo wifi scan connected");	
 					
 		while(socket > 0)
 		{	
-			sem_wait(&semaphore);	
-			if (command == 1)
-			{
+			sem_wait(&semaphore);
+			if (strcmp(scommand, "1") == 0)
+			{		
+				command = 1;	
 				system("echo ----- request received from mobile client");
 				write(socket, &command, sizeof(command));
 				system("echo ----- request sended to wifi scaner");
@@ -92,32 +97,33 @@ void* func (void* arg)
 				{
 					while (read (socket, &str, 256) > 0 && strcmp(str, eom) != 0)
 					{	
-						
+					
 						//printf("%s\n", str);	
 						fputs(str, fp);											
 					}
 					fclose(fp);
 					system("echo ----- wifi info received from wifi scaner");			
-				}			
+				}							
 			}
 			sem_post(&semaphore);	
-			sleep(3);
-		}
-		
+			sleep(1);
+						
+		}		
 		system("echo wifi scan disconnected");
 	}
 	
-	if (clientType == 2) // мобильный клиент
+	if (strcmp(clientType, "2") == 0) // мобильный клиент
 	{
 		system("echo mobile client connected");
 		
-		while(read (socket, &command, sizeof(command)) > 0)
+		while(read (socket, &scommand, sizeof(scommand)) > 0)
 		{	
 			sem_post(&semaphore);
 			sleep(1);
 			sem_wait(&semaphore);			
-			if (command == 1)
+			if (strcmp(scommand, "1") == 0)
 			{	
+				command = 1;
 				FILE *fp = fopen(filename, "r");
 				if(fp)
 				{
@@ -128,8 +134,7 @@ void* func (void* arg)
 					write(socket, eom, sizeof(eom));
 					fclose(fp);
 				} 								
-				system("echo ----- wifi info sended to mobile client\n\n");
-				sleep(5);
+				system("echo ----- wifi info sended to mobile client");
 			}			
 					
 		}
