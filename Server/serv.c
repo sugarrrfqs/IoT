@@ -74,7 +74,7 @@ void* func (void* arg)
 	char str[256] = "s";
 	
 	
-	//system("echo something connected");	
+	system("echo something connected");	
 	read (socket, clientType, sizeof(clientType));
 	//printf("%s\n", clientType);
 	
@@ -106,8 +106,7 @@ void* func (void* arg)
 				}							
 			}
 			sem_post(&semaphore);	
-			sleep(1);
-						
+			sleep(1);				
 		}		
 		system("echo wifi scan disconnected");
 	}
@@ -131,7 +130,7 @@ void* func (void* arg)
 					{				
 						write(socket, str, sizeof(str));
 					}
-					write(socket, eom, sizeof(eom));
+					//write(socket, eom, sizeof(eom));
 					fclose(fp);
 				} 								
 				system("echo ----- wifi info sended to mobile client");
