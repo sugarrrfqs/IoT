@@ -38,7 +38,7 @@ int main()
 	{
 		if (command == 1)
 		{
-			//system("nmcli dev wifi list > /home/sgrrr/IoT/wifiInfo.txt");
+			system("nmcli dev wifi list > /home/sgrrr/IoT/wifiInfo.txt");
 			printf("wifi info collected\n");
 				
 			// чтение из файла и передача серверу
