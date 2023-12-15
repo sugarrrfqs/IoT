@@ -13,7 +13,7 @@ int main()
 	char str[256];	
 	char eom[256] = "---";
 	char clientType[256] = "1";
-	char* filename = "/home/sgrrr/IoT/wifiInfo.txt";
+	char* filename = "/home/sugar/iot/wifiInfo.txt";
 	int command = 0;	
 		
 	sd = socket (AF_INET, SOCK_STREAM, 0);
@@ -26,21 +26,23 @@ int main()
 	if (connect(sd, (struct sockaddr *)&tss_addr, sizeof(tss_addr)) == -1)
 	{ 
 		printf("Connection error\n"); 
+		system("systemd-cat -t WifiScan echo CONNECTION ERROR");
 		return -1; 
 	}
 	else
 	{
 		write(sd, &clientType, sizeof(clientType));
-		printf("Connected\n"); 
+		printf("Connected\n");
+		system("systemd-cat -t WifiScan echo SUCCESSFULLY CONNECTED"); 
 	}
 		
 	while (read(sd, &command, sizeof(command) > 0))
 	{
 		if (command == 1)
 		{
-			system("nmcli dev wifi list > /home/sgrrr/IoT/wifiInfo.txt");
+			//system("nmcli dev wifi list > /home/sugar/iot/wifiInfo.txt");
 			printf("wifi info collected\n");
-				
+			system("systemd-cat -t WifiScan echo INFO COLLECTED");
 			// чтение из файла и передача серверу
 			FILE *fp = fopen(filename, "r");
 			if(fp)
