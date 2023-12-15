@@ -14,7 +14,7 @@ void* func (void* arg);
 
 int command = -1;
 char scommand[256];
-char* filename = "/home/sgrrr/IoT/serverWifiInfo.txt";
+char* filename = "/home/sugar/iot/serverWifiInfo.txt";
 char eom[256] = "---";
 sem_t semaphore;
 
@@ -74,7 +74,7 @@ void* func (void* arg)
 	char str[256] = "s";
 	
 	
-	system("echo something connected");	
+	//system("echo something connected");	
 	read (socket, clientType, sizeof(clientType));
 	//printf("%s\n", clientType);
 	
@@ -127,10 +127,11 @@ void* func (void* arg)
 				if(fp)
 				{
 					while(fgets(str, 256, fp) != NULL)
-					{				
+					{		
+						//printf("%s\n", str);
 						write(socket, str, sizeof(str));
 					}
-					//write(socket, eom, sizeof(eom));
+					write(socket, eom, sizeof(eom)); // строка для дебаггинга
 					fclose(fp);
 				} 								
 				system("echo ----- wifi info sended to mobile client");
