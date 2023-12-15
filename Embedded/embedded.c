@@ -40,6 +40,7 @@ int main()
 	{
 		if (command == 1)
 		{
+			system("systemd-cat -t WifiScan echo RECIEVED WIFI INFO REQUEST");
 			//system("nmcli dev wifi list > /home/sugar/iot/wifiInfo.txt");
 			printf("wifi info collected\n");
 			system("systemd-cat -t WifiScan echo INFO COLLECTED");
@@ -56,9 +57,11 @@ int main()
 				write(sd, eom, sizeof(eom));
 				fclose(fp);
 			} 
+			system("systemd-cat -t WifiScan echo WIFI INFO SENDED");
 		}
 	}
 	
 	close (sd);
+	system("systemd-cat -t WifiScan echo SUCCESSFULLY DISCONNECTED"); 
 	return 0;
 }
